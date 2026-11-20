@@ -68,7 +68,7 @@ Status: done (2026-11-19).
 curl -LsSf https://astral.sh/uv/install.sh | sh   # once
 cd ~/projects/lerobot-research
 unset PYTHONPATH                                   # ROS 2 isolation, in every LeRobot terminal
-uv sync --locked
+uv sync --locked --extra feetech --extra core_scripts --inexact   # extras added in M4
 uv pip install -r research/requirements-so101-sim.txt
 uv run --no-sync python research/scripts/so101_smoke_test.py
 ```
@@ -107,7 +107,24 @@ Status: in progress (branch `research/m3-sim-baseline`).
   - **Sim-to-real (M8):** the real STS3215 at P=16/D=32 almost certainly does NOT ring like this (its D term and internal speed and acceleration limits damp it). Running this same test on hardware will be the first sim-vs-real measurement.
 
 ## Milestone 4 — Understand the Robot-Learning Pipeline
-Status: not started.
+Status: in progress (branch `research/m4-data-pipeline`).
+
+Plan: 4.1 sim robot via the `Robot` API → 4.2 action sources (a: leader-arm readiness, b: scripted IK expert as a `Teleoperator`) → 4.3 record a dataset → 4.4 inspect it → 4.5 replay and determinism → 4.6 policy inference path.
+**Decision (2026-11-20):** an SO-101 leader arm exists but isn't available yet. We record with a scripted expert (option B) now, and keep the leader-arm route (option A) ready and checked without hardware.
+
+- 2026-11-20 — **4.1 Sim robot** (`research/scripts/so101_sim_robot_demo.py`). `SimRobotConfig(env=HubEnvConfig(...))` → `SimRobot`, the same object `--robot.type=sim --robot.env.type=envhub` builds.
+  - `robot_type=so_follower`. `action_features` = the 6 `<motor>.pos` names, **identical to the real `so_follower` and `so_leader`** (both `use_degrees=True`). A leader arm's `get_action()` can therefore feed `send_action()` directly.
+  - `get_observation()` does not advance time (two reads are identical). `send_action()` advances exactly one 1/30 s step. Simulated time is decoupled from wall clock (44 steps/s here), so `--fps` must equal the env's 30.
+  - Smooth ±25° pan sine over 4 s (peak ~39 °/s): tracking error mean 0.22°, max 0.66°, with no ringing, unlike the 3.3 steps. ⇒ The scripted expert must send smooth, interpolated targets.
+  - Seed 0 start state identical to M2's through a different code path. Wrong action names are rejected at the first `send_action()`.
+- 2026-11-20 — **4.2a Leader-arm readiness (option A), checked without hardware.**
+  - Installed `uv sync --locked --extra feetech --extra core_scripts --inexact` (22 packages: rustypot, pyserial, datasets, pyarrow, av, torchcodec, pynput, rerun-sdk…). **`--inexact` is essential**: a plain sync removes the mujoco 3.3.7 / matplotlib packages that live outside the lock.
+  - Added the user to `dialout` (serial ports are `root:dialout`; without it you get `Permission denied`, which is easy to misread as a cable or driver fault).
+  - `research/scripts/so101_leader_readiness.py`: PASS, `SOLeader` action names and order == `SimRobot`'s. PASS, leader joints in degrees, gripper 0–100.
+  - Real degree mode = `(raw − mid)·360/4095`, with `mid` the middle of the **calibrated** range. So the leader's 0° = mid of the recorded travel, while the sim's 0° = MJCF zero. The sim's joint ranges are symmetric (so101_new_calib), so they should roughly agree; **measure the per-joint offset when the arm arrives** (M8 input).
+  - `lerobot-teleoperate --robot.type=sim … --teleop.type=so101_leader …` parsed, built the sim robot, and failed only at `bus.connect()` on the missing port, as expected.
+  - Default settings to watch: `lerobot-teleoperate --fps` defaults to **60** (must be 30 for this sim); `lerobot-record --dataset.push_to_hub` defaults to **true**.
+  - Runbook: `research/runbooks/so101_leader_to_sim.md`.
 
 ## Milestone 5 — First Controlled Customisation
 Status: not started.
