@@ -17,6 +17,22 @@ Milestone structure follows `motive.md`. Each entry records the date, what was d
 
 ---
 
+## Git workflow (set 2026-11-20)
+
+```
+main ────────────── mirror of huggingface/lerobot (never commit research work here)
+  └─ research/main ─ integration branch; each verified milestone is merged in
+       └─ research/mN-<topic> ─ one branch per milestone, merged back by a PR inside the fork
+```
+
+- `origin` = `git@github.com:ronyroyce/lerobot-research.git` (SSH, key `~/.ssh/id_ed25519`). `upstream` = huggingface/lerobot with push DISABLED.
+- PRs are opened through `https://github.com/ronyroyce/lerobot-research/compare/research/main...<branch>` and merged with **Create a merge commit**, which keeps each milestone boundary visible in the history.
+- ⚠️ The fork's "Compare & pull request" banner defaults its base to `huggingface/lerobot`. Always check the **base repository** before clicking Create.
+- Pulling upstream updates: `git fetch upstream` → on `main`: `git merge upstream/main` → on `research/main`: `git merge main`. This stays conflict-free because research work lives only in `research/` and `research_log.md`.
+- History: M2 was merged through PR #1 (merge commit `9f437d0c9`).
+
+---
+
 ## Milestone 1 — Understand LeRobot's Architecture
 Status: in progress (studied in a separate learning chat). Simulator located and reviewed.
 
@@ -60,7 +76,35 @@ uv run --no-sync python research/scripts/so101_smoke_test.py
 **Milestone 2: DONE (base env).** Extras for datasets, visualisation and teleoperation (`dataset`, `viz`, `feetech`) will be added in Milestone 4 when they're actually needed.
 
 ## Milestone 3 — Run an Existing Simulation Baseline
-Status: not started.
+Status: in progress (branch `research/m3-sim-baseline`).
+
+- 2026-11-20 — **3.1 Interactive viewer** (`research/scripts/so101_viewer.py`): opens `mujoco.viewer.launch` on the env's own MjModel/MjData after a seeded reset (`--check` prints a summary without a window). The physics step is 4.762 ms × 7 substeps = 1/30 s: Menagerie's 5 ms step, adjusted by env.py to divide the control period exactly. 10 joints = 6 arm hinges + 4 cube free joints. Viewer sliders write raw actuator `ctrl` in **radians**, below the env's degree/0–100 interface (`to_ctrl`). Checked visually by the user: arm, gripper, perturbations, contacts and cameras all behave plausibly.
+- 2026-11-20 — **3.2 Model inspection** (`research/scripts/so101_inspect_model.py`) → baseline file `research/baselines/so101_tabletop_model.json` (all joints, actuators, bodies, collision geoms, cameras and solver options; diff against it in M5).
+  - Solver: implicitfast integrator, Newton solver, elliptic friction cone, gravity −9.81.
+  - **All 6 joints share one STS3215 servo model** (Menagerie class `sts3215`): damping 0.60, armature 0.028, frictionloss 0.052. Position actuator kp = 998.22 N·m/rad, kv = 2.731, **forcerange ±2.94 N·m**.
+  - ⇒ Saturation: kp·error reaches 2.94 N·m once the error exceeds 2.94/998 rad ≈ **0.17°**. For any real move the actuator is **torque-saturated** (bang-bang-like), and kp only matters in the final ~0.17°. *Prediction to test in 3.3:* the unloaded top speed is set by torque/(damping + kv) ≈ 2.94/3.33 ≈ 0.88 rad/s ≈ **50°/s**, modified by gravity on the shoulder and elbow.
+  - Masses: cubes 10 g (3 cm, friction 1.0/0.03/0.003, condim 4), box 93 g (5 static geoms), arm links 79–147 g. Gripper collision is approximated by primitive boxes, spheres and capsules (condim 6, solref 0.01).
+  - Cameras: `front` (world, fovy 60°), `top` (world, 60°, not used in observations), `wrist_cam` (on `camera_mount`, 61°).
+  - **Sim-to-real notes (for M8):**
+    1. Menagerie's comment: the gains "are not a 1-to-1 mapping of the servo gains used in LeRobot". They were derived assuming servo P = 16. LeRobot's `so_follower` does write P = 16, but also **D = 32** and I = 0 (`config_so_follower.py:45-47`). The sim's kv was not derived from D = 32.
+    2. The real follower limits the **gripper to 50 % torque** (`Max_Torque_Limit=500`, `so_follower.py:155`). The sim gripper has the full ±2.94 N·m, so **sim grasps are stronger than real ones**.
+    3. Menagerie defines a ±0.5° backlash class but applies it to no joint. The real servos have backlash; the sim has none.
+- 2026-11-20 — **3.3 Step response** (`research/scripts/so101_step_response.py` → `research/results/m3_step_response.{json,png}`). Seed 0; ±20° steps through the env's `to_ctrl`; 210 Hz trace (one physics substep per sample); 2 s per test.
+
+  | joint | step | rise 10–90 % | peak speed | overshoot | settle (±0.5°) | ss error | others moved |
+  |---|---|---|---|---|---|---|---|
+  | shoulder_pan | ±20° | 0.090 s | 223.5 °/s | 18.6 % | 0.31 s | 0.000° | 0.04° |
+  | shoulder_lift | +20° | 0.090 s | 233.6 °/s | 22.0 % | 0.33 s | +0.013° | 0.05° |
+  | shoulder_lift | −20° | 0.095 s | 218.1 °/s | 18.3 % | 0.32 s | +0.003° | 0.06° |
+  | elbow_flex | +20° | 0.086 s | 242.2 °/s | 10.1 % | 0.22 s | +0.002° | 0.32° |
+  | elbow_flex | −20° | 0.105 s | 193.9 °/s | 16.7 % | 0.34 s | +0.026° | 0.04° |
+
+  - **My 3.2 prediction (~50 °/s) was wrong by about 4×.** Wrong assumption: kv brakes the motion. In MuJoCo, `forcerange` clips the *whole* actuator force, kp·(ctrl−q) − kv·q̇, and kp·error (≈350 N·m for 20°) is far above 2.94 N·m. So while saturated, **kv has no effect**, and only the passive joint damping (0.60) and frictionloss (0.052) resist. Corrected terminal speed = (2.94 − 0.052)/0.60 = 4.81 rad/s = **275.8 °/s**. Checked with a 90° shoulder_pan move: **274.1 °/s** measured (0.6 % off). The 20° moves are too short to reach top speed, hence ~220 °/s.
+  - **Saturated (bang-bang) behaviour, visible in the torque plot:** full +2.94 N·m to accelerate, then full −2.94 N·m to brake. Because braking torque is also capped, the joint can't stop in time → **10–22 % overshoot** and 1–2 ringing cycles, settling in ~0.3 s. This is far from the critically damped response that kp = 998 might suggest.
+  - **From the policy's point of view (30 Hz):** a 20° step reaches 90 % in under 3 frames, and the overshoot and ringing last about 10 frames. A policy that sends large jumps in target will see oscillation in `observation.state`. Smooth trajectories (action chunking, as ACT does) avoid this.
+  - Gravity changes the response only slightly: shoulder_lift ±20° differ by ~7 % in peak speed, and elbow_flex is the most asymmetric (+20°: faster, less overshoot; −20°: slower, more ringing). Coupling: an elbow_flex +20° step moves the other joints by up to 0.32°.
+  - Steady-state error is almost zero (≤ 0.026°): kp = 998 holds against gravity once the joint leaves saturation.
+  - **Sim-to-real (M8):** the real STS3215 at P=16/D=32 almost certainly does NOT ring like this (its D term and internal speed and acceleration limits damp it). Running this same test on hardware will be the first sim-vs-real measurement.
 
 ## Milestone 4 — Understand the Robot-Learning Pipeline
 Status: not started.
