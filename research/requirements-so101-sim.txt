@@ -4,3 +4,7 @@
 # Install after `uv sync --locked` (which removes packages not in the lock):
 #   unset PYTHONPATH && uv sync --locked && uv pip install -r research/requirements-so101-sim.txt
 mujoco==3.3.7
+
+# Analysis/plotting for research scripts (same versions as uv.lock's matplotlib-dep extra).
+matplotlib==3.11.2
+contourpy==1.4.0
