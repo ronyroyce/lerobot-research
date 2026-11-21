@@ -56,6 +56,15 @@ class SO101Kinematics:
         self.qadr = np.array([model.joint(j).qposadr[0] for j in ARM_JOINTS])
         self.dadr = np.array([model.joint(j).dofadr[0] for j in ARM_JOINTS])
         self.lo, self.hi = model.jnt_range[[model.joint(j).id for j in ARM_JOINTS]].T
+        self.gripper_qadr = model.joint("gripper").qposadr[0]
+        g_lo, g_hi = model.jnt_range[model.joint("gripper").id]
+        self.gripper_rad = lambda value: g_lo + value / 100 * (g_hi - g_lo)  # env units 0-100 -> rad
+        # Collision geoms of the hand: everything that can touch a neighbouring cube during a grasp.
+        hand = {model.body(b).id for b in ("wrist", "gripper", "moving_jaw_so101_v1", "camera_mount")}
+        self.hand_geoms = [
+            g for g in range(model.ngeom)
+            if model.geom_bodyid[g] in hand and (model.geom_contype[g] or model.geom_conaffinity[g])
+        ]
 
     def fk(self, q: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Tool point position (3,) and site rotation matrix (3, 3) in world, for arm angles q [rad]."""
@@ -103,14 +112,34 @@ class SO101Kinematics:
 
     def ik_grasp(self, target: np.ndarray, cube_yaw: float, q0: np.ndarray) -> IKResult:
         """Top-down IK for a cube: a cube looks the same every 90 deg, so try the 4 jaw headings and keep
-        the converged one that needs the least wrist roll (least motion, furthest from the roll limits)."""
-        best = None
-        for k in range(4):
-            res = self.ik_topdown(target, cube_yaw + k * np.pi / 2, q0)
-            score = (not res.converged, abs(res.q[4] - q0[4]))
-            if best is None or score < best[0]:
-                best = (score, res)
-        return best[1]
+        the converged one that needs the least wrist roll."""
+        return min(self.grasp_candidates(target, cube_yaw, q0), key=lambda r: (not r.converged, abs(r.q[4] - q0[4])))
+
+    def grasp_candidates(self, target: np.ndarray, cube_yaw: float, q0: np.ndarray) -> list[IKResult]:
+        """IK for each of the 4 equivalent jaw headings of a cube."""
+        return [self.ik_topdown(target, cube_yaw + k * np.pi / 2, q0) for k in range(4)]
+
+    # ---- collision clearance, measured on MuJoCo's real collision geometry ----
+    def sync(self, live: mujoco.MjData) -> None:
+        """Copy the live scene (cube poses etc.) into the private data used for planning checks."""
+        self.data.qpos[:] = live.qpos
+
+    def clearance(self, q_arm: np.ndarray, gripper_rad: float, robot_geoms, obstacle_geoms, cap: float = 0.05) -> float:
+        """Smallest distance [m] between the robot geoms and the obstacle geoms at arm pose q_arm.
+        mj_geomDistance works on the actual collision shapes (boxes, spheres, convex mesh hulls)."""
+        self.data.qpos[self.qadr] = q_arm
+        self.data.qpos[self.gripper_qadr] = gripper_rad
+        mujoco.mj_kinematics(self.model, self.data)
+        fromto = np.zeros(6)
+        m = self.model
+        # Only pairs that MuJoCo would actually let collide: (contype1 & conaffinity2) or the reverse.
+        # mj_geomDistance ignores these bitmasks; without the filter, hand geoms that can never touch a cube
+        # reported 0 mm "clearance" in episodes where nothing moved (4.2b).
+        pairs = [
+            (g1, g2) for g1 in robot_geoms for g2 in obstacle_geoms
+            if (m.geom_contype[g1] & m.geom_conaffinity[g2]) or (m.geom_contype[g2] & m.geom_conaffinity[g1])
+        ]
+        return min((mujoco.mj_geomDistance(m, self.data, g1, g2, cap, fromto) for g1, g2 in pairs), default=cap)
 
 
 def body_yaw(data: mujoco.MjData, body: int) -> float:
@@ -163,6 +192,7 @@ BOX_SLOT = 0.022  # drop points at (+-2.2, +-2.2) cm in the box frame, so cubes 
 #     Known env limitation: the 4th cube is below 6 cm while still held, so env.py reports success (and
 #     terminates) just before the last release. Candidate M5 change: success only for released cubes.
 DROP_CUBE_Z = 0.051
+MIN_CLEARANCE = 0.005  # hand-to-neighbour gap wanted during the descent [m]
 DROP_CLEAR = 0.015  # approach from 1.5 cm above (tool at ~8.3 cm; top-down reach over the box ends near 10 cm)
 # Where the cube's centre sits relative to the tool point, in gripperframe axes, once grasped (measured, stable
 # from closing to release). -0.78 cm along the closing axis: the moving jaw slides the cube onto the fixed
@@ -242,25 +272,51 @@ class PickPlaceExpert:
         g_now = float(self.world.joint_state()[5])
         cube = data.xpos[self.cubes[i]].copy()
 
-        grasp = self.kin.ik_grasp(cube, body_yaw(data, self.cubes[i]), q_now)
-        h_pre, pre = max_topdown_height(self.kin, cube, grasp.heading, grasp.q)
+        # Choose the jaw heading: of the 4 equivalent ones, those whose descent keeps the hand at least
+        # MIN_CLEARANCE from every other cube (measured with mj_geomDistance), least wrist roll first; then
+        # the rest by clearance. Fall through to the next heading if the rest of the plan is infeasible.
+        # (4.2b: choosing by wrist roll alone bumped a neighbour in 3/40 episodes, always while descending.)
+        self.kin.sync(data)
+        obstacles = [g for j, c in enumerate(self.cubes) if j != i
+                     for g in np.flatnonzero(self.world.model.geom_bodyid == c)]
+        g_open = self.kin.gripper_rad(GRIPPER_OPEN)
+        cands = []
+        for res in self.kin.grasp_candidates(cube, body_yaw(data, self.cubes[i]), q_now):
+            if not res.converged:
+                continue
+            h, pre = max_topdown_height(self.kin, cube, res.heading, res.q)
+            if pre is None:
+                continue
+            # Clearance along the descent: pre-grasp, two intermediate poses, grasp.
+            path = [pre.q] + [self.kin.ik_topdown(cube + [0, 0, f * h], res.heading, res.q).q for f in (0.66, 0.33)] + [res.q]
+            self.kin.sync(data)
+            clear = min(self.kin.clearance(q, g_open, self.kin.hand_geoms, obstacles) for q in path)
+            cands.append(((clear < MIN_CLEARANCE, -clear if clear < MIN_CLEARANCE else abs(res.q[4] - q_now[4])), res, h, pre, clear))
+        cands.sort(key=lambda c: c[0])
+
         drop_cube = self.box_centre() if k is None else self.slot(k)
-        # Pick the jaw heading at the drop first (least roll change), then move the tool so the cube's
-        # centre, not the tool point, ends up over the slot.
-        first = self.kin.ik_grasp(drop_cube, grasp.heading, grasp.q)
-        heading = first.heading
-        drop_p = drop_cube - self.topdown_rotation(heading) @ CUBE_IN_GRIPPER
-        drop = self.kin.ik_topdown(drop_p, heading, first.q)  # warm start next to the answer
-        above_p = drop_p + [0, 0, DROP_CLEAR]
-        above = self.kin.ik_topdown(above_p, heading, drop.q)
-        entry = {
-            "cube": self.names[i], "slot": k, "cube_xyz": cube.round(4).tolist(), "drop_xyz": drop_cube.round(4).tolist(),
-            "grasp_ok": grasp.converged, "pre_h": h_pre, "drop_ok": drop.converged and above.converged,
-        }
+        entry = {"cube": self.names[i], "slot": k, "cube_xyz": cube.round(4).tolist(),
+                 "drop_xyz": drop_cube.round(4).tolist(), "headings_feasible": len(cands)}
         self.log.append(entry)
-        if pre is None or not (grasp.converged and drop.converged and above.converged):
+        plan = None
+        for _, grasp, h_pre, pre, clear in cands:
+            # Pick the jaw heading at the drop (least roll change), then move the tool so the cube's centre,
+            # not the tool point, ends up over the drop point.
+            first = self.kin.ik_grasp(drop_cube, grasp.heading, grasp.q)
+            heading = first.heading
+            drop_p = drop_cube - self.topdown_rotation(heading) @ CUBE_IN_GRIPPER
+            drop = self.kin.ik_topdown(drop_p, heading, first.q)  # warm start next to the answer
+            above_p = drop_p + [0, 0, DROP_CLEAR]
+            above = self.kin.ik_topdown(above_p, heading, drop.q)
+            if first.converged and drop.converged and above.converged:
+                plan = (grasp, h_pre, pre, heading, drop_p, drop, above_p, above)
+                entry.update(grasp_heading_deg=round(float(np.rad2deg(grasp.heading)), 1),
+                             descent_clearance_mm=round(1e3 * clear, 1), pre_h=h_pre)
+                break
+        if plan is None:
             entry["skipped"] = True
             return
+        grasp, h_pre, pre, heading, drop_p, drop, above_p, above = plan
 
         lift_p = cube + [0, 0, h_pre]
         yield from self._joint(q_now, pre.q, g_now, GRIPPER_OPEN, 1.5)  # over the cube, jaws open
