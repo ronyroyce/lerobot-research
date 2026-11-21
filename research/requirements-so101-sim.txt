@@ -1,0 +1,10 @@
+# Extra packages for the SO-101 MuJoCo EnvHub env (lerobot/so101-tabletop-mujoco@4684f500b94d07194f2c860314c4e27cb9349e8c).
+# Kept outside pyproject.toml/uv.lock so upstream merges stay conflict-free.
+# The lock has mujoco 3.8.1 (via other sim extras); we match the env author's pin for identical physics.
+# Install after `uv sync --locked` (which removes packages not in the lock):
+#   unset PYTHONPATH && uv sync --locked && uv pip install -r research/requirements-so101-sim.txt
+mujoco==3.3.7
+
+# Analysis/plotting for research scripts (same versions as uv.lock's matplotlib-dep extra).
+matplotlib==3.11.2
+contourpy==1.4.0

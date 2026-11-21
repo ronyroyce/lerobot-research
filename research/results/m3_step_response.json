@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "revision": "4684f500b94d07194f2c860314c4e27cb9349e8c",
+    "mujoco": "3.3.7",
+    "seed": 0,
+    "duration_s": 2.0,
+    "settle_band_deg": 0.5
+  },
+  "results": [
+    {
+      "joint": "shoulder_pan",
+      "step_deg": 20.0,
+      "start_deg": 0.548,
+      "target_deg": 20.548,
+      "rise_time_s": 0.0905,
+      "peak_speed_dps": 223.53,
+      "overshoot_pct": 18.62,
+      "settle_time_s": 0.3143,
+      "ss_error_deg": -0.0,
+      "torque_saturated_s": 0.3286,
+      "max_other_joint_dev_deg": 0.038
+    },
+    {
+      "joint": "shoulder_pan",
+      "step_deg": -20.0,
+      "start_deg": 0.548,
+      "target_deg": -19.452,
+      "rise_time_s": 0.0905,
+      "peak_speed_dps": 223.53,
+      "overshoot_pct": 18.62,
+      "settle_time_s": 0.3143,
+      "ss_error_deg": -0.0,
+      "torque_saturated_s": 0.3286,
+      "max_other_joint_dev_deg": 0.038
+    },
+    {
+      "joint": "shoulder_lift",
+      "step_deg": 20.0,
+      "start_deg": -60.921,
+      "target_deg": -40.921,
+      "rise_time_s": 0.0905,
+      "peak_speed_dps": 233.6,
+      "overshoot_pct": 21.98,
+      "settle_time_s": 0.3286,
+      "ss_error_deg": 0.0127,
+      "torque_saturated_s": 0.3333,
+      "max_other_joint_dev_deg": 0.054
+    },
+    {
+      "joint": "shoulder_lift",
+      "step_deg": -20.0,
+      "start_deg": -60.921,
+      "target_deg": -80.921,
+      "rise_time_s": 0.0952,
+      "peak_speed_dps": 218.13,
+      "overshoot_pct": 18.31,
+      "settle_time_s": 0.319,
+      "ss_error_deg": 0.003,
+      "torque_saturated_s": 0.3286,
+      "max_other_joint_dev_deg": 0.057
+    },
+    {
+      "joint": "elbow_flex",
+      "step_deg": 20.0,
+      "start_deg": 58.164,
+      "target_deg": 78.164,
+      "rise_time_s": 0.0857,
+      "peak_speed_dps": 242.25,
+      "overshoot_pct": 10.12,
+      "settle_time_s": 0.219,
+      "ss_error_deg": 0.0021,
+      "torque_saturated_s": 0.2286,
+      "max_other_joint_dev_deg": 0.319
+    },
+    {
+      "joint": "elbow_flex",
+      "step_deg": -20.0,
+      "start_deg": 58.164,
+      "target_deg": 38.164,
+      "rise_time_s": 0.1048,
+      "peak_speed_dps": 193.91,
+      "overshoot_pct": 16.71,
+      "settle_time_s": 0.3381,
+      "ss_error_deg": 0.0258,
+      "torque_saturated_s": 0.3619,
+      "max_other_joint_dev_deg": 0.041
+    }
+  ]
+}

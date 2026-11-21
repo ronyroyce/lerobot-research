@@ -1,0 +1,1550 @@
+{
+  "source": {
+    "repo": "lerobot/so101-tabletop-mujoco",
+    "revision": "4684f500b94d07194f2c860314c4e27cb9349e8c",
+    "mujoco": "3.3.7"
+  },
+  "option": {
+    "timestep": 0.004761904761904762,
+    "substeps_per_env_step": 7,
+    "integrator": "mjINT_IMPLICITFAST",
+    "solver": "mjSOL_NEWTON",
+    "iterations": 10,
+    "tolerance": 1e-08,
+    "cone": "mjCONE_ELLIPTIC",
+    "impratio": 10.0,
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "noslip_iterations": 0
+  },
+  "joints": [
+    {
+      "name": "<unnamed 0>",
+      "type": "free",
+      "limited": false,
+      "range_rad": [
+        0.0,
+        0.0
+      ],
+      "range_deg": [
+        0.0,
+        0.0
+      ],
+      "damping": 0.0,
+      "armature": 0.0,
+      "frictionloss": 0.0
+    },
+    {
+      "name": "<unnamed 1>",
+      "type": "free",
+      "limited": false,
+      "range_rad": [
+        0.0,
+        0.0
+      ],
+      "range_deg": [
+        0.0,
+        0.0
+      ],
+      "damping": 0.0,
+      "armature": 0.0,
+      "frictionloss": 0.0
+    },
+    {
+      "name": "<unnamed 2>",
+      "type": "free",
+      "limited": false,
+      "range_rad": [
+        0.0,
+        0.0
+      ],
+      "range_deg": [
+        0.0,
+        0.0
+      ],
+      "damping": 0.0,
+      "armature": 0.0,
+      "frictionloss": 0.0
+    },
+    {
+      "name": "<unnamed 3>",
+      "type": "free",
+      "limited": false,
+      "range_rad": [
+        0.0,
+        0.0
+      ],
+      "range_deg": [
+        0.0,
+        0.0
+      ],
+      "damping": 0.0,
+      "armature": 0.0,
+      "frictionloss": 0.0
+    },
+    {
+      "name": "shoulder_pan",
+      "type": "hinge",
+      "limited": true,
+      "range_rad": [
+        -1.91986,
+        1.91986
+      ],
+      "range_deg": [
+        -110.0,
+        110.0
+      ],
+      "damping": 0.6,
+      "armature": 0.028,
+      "frictionloss": 0.052
+    },
+    {
+      "name": "shoulder_lift",
+      "type": "hinge",
+      "limited": true,
+      "range_rad": [
+        -1.74533,
+        1.74533
+      ],
+      "range_deg": [
+        -100.0,
+        100.0
+      ],
+      "damping": 0.6,
+      "armature": 0.028,
+      "frictionloss": 0.052
+    },
+    {
+      "name": "elbow_flex",
+      "type": "hinge",
+      "limited": true,
+      "range_rad": [
+        -1.69,
+        1.69
+      ],
+      "range_deg": [
+        -96.83,
+        96.83
+      ],
+      "damping": 0.6,
+      "armature": 0.028,
+      "frictionloss": 0.052
+    },
+    {
+      "name": "wrist_flex",
+      "type": "hinge",
+      "limited": true,
+      "range_rad": [
+        -1.65806,
+        1.65806
+      ],
+      "range_deg": [
+        -95.0,
+        95.0
+      ],
+      "damping": 0.6,
+      "armature": 0.028,
+      "frictionloss": 0.052
+    },
+    {
+      "name": "wrist_roll",
+      "type": "hinge",
+      "limited": true,
+      "range_rad": [
+        -2.74385,
+        2.84121
+      ],
+      "range_deg": [
+        -157.21,
+        162.79
+      ],
+      "damping": 0.6,
+      "armature": 0.028,
+      "frictionloss": 0.052
+    },
+    {
+      "name": "gripper",
+      "type": "hinge",
+      "limited": true,
+      "range_rad": [
+        -0.17453,
+        1.74533
+      ],
+      "range_deg": [
+        -10.0,
+        100.0
+      ],
+      "damping": 0.6,
+      "armature": 0.028,
+      "frictionloss": 0.052
+    }
+  ],
+  "actuators": [
+    {
+      "name": "shoulder_pan",
+      "joint": "shoulder_pan",
+      "kp": 998.22,
+      "kv": 2.731,
+      "ctrlrange_rad": [
+        -1.91986,
+        1.91986
+      ],
+      "forcelimited": true,
+      "forcerange": [
+        -2.94,
+        2.94
+      ]
+    },
+    {
+      "name": "shoulder_lift",
+      "joint": "shoulder_lift",
+      "kp": 998.22,
+      "kv": 2.731,
+      "ctrlrange_rad": [
+        -1.74533,
+        1.74533
+      ],
+      "forcelimited": true,
+      "forcerange": [
+        -2.94,
+        2.94
+      ]
+    },
+    {
+      "name": "elbow_flex",
+      "joint": "elbow_flex",
+      "kp": 998.22,
+      "kv": 2.731,
+      "ctrlrange_rad": [
+        -1.69,
+        1.69
+      ],
+      "forcelimited": true,
+      "forcerange": [
+        -2.94,
+        2.94
+      ]
+    },
+    {
+      "name": "wrist_flex",
+      "joint": "wrist_flex",
+      "kp": 998.22,
+      "kv": 2.731,
+      "ctrlrange_rad": [
+        -1.65806,
+        1.65806
+      ],
+      "forcelimited": true,
+      "forcerange": [
+        -2.94,
+        2.94
+      ]
+    },
+    {
+      "name": "wrist_roll",
+      "joint": "wrist_roll",
+      "kp": 998.22,
+      "kv": 2.731,
+      "ctrlrange_rad": [
+        -2.74385,
+        2.84121
+      ],
+      "forcelimited": true,
+      "forcerange": [
+        -2.94,
+        2.94
+      ]
+    },
+    {
+      "name": "gripper",
+      "joint": "gripper",
+      "kp": 998.22,
+      "kv": 2.731,
+      "ctrlrange_rad": [
+        -0.17453,
+        1.74533
+      ],
+      "forcelimited": true,
+      "forcerange": [
+        -2.94,
+        2.94
+      ]
+    }
+  ],
+  "bodies": [
+    {
+      "name": "red_cube",
+      "parent": "world",
+      "mass_kg": 0.01,
+      "inertia_diag": [
+        1.5e-06,
+        1.5e-06,
+        1.5e-06
+      ]
+    },
+    {
+      "name": "green_cube",
+      "parent": "world",
+      "mass_kg": 0.01,
+      "inertia_diag": [
+        1.5e-06,
+        1.5e-06,
+        1.5e-06
+      ]
+    },
+    {
+      "name": "blue_cube",
+      "parent": "world",
+      "mass_kg": 0.01,
+      "inertia_diag": [
+        1.5e-06,
+        1.5e-06,
+        1.5e-06
+      ]
+    },
+    {
+      "name": "yellow_cube",
+      "parent": "world",
+      "mass_kg": 0.01,
+      "inertia_diag": [
+        1.5e-06,
+        1.5e-06,
+        1.5e-06
+      ]
+    },
+    {
+      "name": "box",
+      "parent": "world",
+      "mass_kg": 0.0933,
+      "inertia_diag": [
+        0.0002267,
+        0.0001244,
+        0.0001244
+      ]
+    },
+    {
+      "name": "base",
+      "parent": "world",
+      "mass_kg": 0.147,
+      "inertia_diag": [
+        0.0001361,
+        0.0001318,
+        0.0001132
+      ]
+    },
+    {
+      "name": "shoulder",
+      "parent": "base",
+      "mass_kg": 0.10001,
+      "inertia_diag": [
+        8.38e-05,
+        8.1e-05,
+        2.4e-05
+      ]
+    },
+    {
+      "name": "upper_arm",
+      "parent": "shoulder",
+      "mass_kg": 0.103,
+      "inertia_diag": [
+        0.0001509,
+        0.0001425,
+        3.72e-05
+      ]
+    },
+    {
+      "name": "lower_arm",
+      "parent": "upper_arm",
+      "mass_kg": 0.104,
+      "inertia_diag": [
+        0.0001603,
+        0.0001453,
+        2.83e-05
+      ]
+    },
+    {
+      "name": "wrist",
+      "parent": "lower_arm",
+      "mass_kg": 0.079,
+      "inertia_diag": [
+        3.68e-05,
+        2.74e-05,
+        1.89e-05
+      ]
+    },
+    {
+      "name": "gripper",
+      "parent": "wrist",
+      "mass_kg": 0.087,
+      "inertia_diag": [
+        4.34e-05,
+        3.77e-05,
+        2.43e-05
+      ]
+    },
+    {
+      "name": "camera_mount",
+      "parent": "gripper",
+      "mass_kg": 0.01344,
+      "inertia_diag": [
+        5.4e-06,
+        4.2e-06,
+        1.4e-06
+      ]
+    },
+    {
+      "name": "moving_jaw_so101_v1",
+      "parent": "gripper",
+      "mass_kg": 0.012,
+      "inertia_diag": [
+        6.6e-06,
+        5.3e-06,
+        1.9e-06
+      ]
+    }
+  ],
+  "geoms": [
+    {
+      "name": "table",
+      "body": "world",
+      "type": "BOX",
+      "size": [
+        0.4,
+        0.4,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "floor",
+      "body": "world",
+      "type": "PLANE",
+      "size": [
+        1.0,
+        1.5,
+        0.05
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 9>",
+      "body": "red_cube",
+      "type": "BOX",
+      "size": [
+        0.015,
+        0.015,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.03,
+        0.003
+      ],
+      "condim": 4,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 10>",
+      "body": "green_cube",
+      "type": "BOX",
+      "size": [
+        0.015,
+        0.015,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.03,
+        0.003
+      ],
+      "condim": 4,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 11>",
+      "body": "blue_cube",
+      "type": "BOX",
+      "size": [
+        0.015,
+        0.015,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.03,
+        0.003
+      ],
+      "condim": 4,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 12>",
+      "body": "yellow_cube",
+      "type": "BOX",
+      "size": [
+        0.015,
+        0.015,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.03,
+        0.003
+      ],
+      "condim": 4,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 13>",
+      "body": "box",
+      "type": "BOX",
+      "size": [
+        0.049,
+        0.049,
+        0.002
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 14>",
+      "body": "box",
+      "type": "BOX",
+      "size": [
+        0.002,
+        0.049,
+        0.0175
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 15>",
+      "body": "box",
+      "type": "BOX",
+      "size": [
+        0.002,
+        0.049,
+        0.0175
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 16>",
+      "body": "box",
+      "type": "BOX",
+      "size": [
+        0.049,
+        0.002,
+        0.0175
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 17>",
+      "body": "box",
+      "type": "BOX",
+      "size": [
+        0.049,
+        0.002,
+        0.0175
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 23>",
+      "body": "shoulder",
+      "type": "BOX",
+      "size": [
+        0.023,
+        0.015,
+        0.01
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 25>",
+      "body": "shoulder",
+      "type": "BOX",
+      "size": [
+        0.038,
+        0.025,
+        0.02
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 28>",
+      "body": "upper_arm",
+      "type": "BOX",
+      "size": [
+        0.01,
+        0.07,
+        0.03
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 30>",
+      "body": "upper_arm",
+      "type": "BOX",
+      "size": [
+        0.01,
+        0.02,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 32>",
+      "body": "lower_arm",
+      "type": "BOX",
+      "size": [
+        0.07,
+        0.01,
+        0.03
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 34>",
+      "body": "lower_arm",
+      "type": "BOX",
+      "size": [
+        0.023,
+        0.013,
+        0.018
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 37>",
+      "body": "wrist",
+      "type": "BOX",
+      "size": [
+        0.029,
+        0.015,
+        0.018
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 39>",
+      "body": "wrist",
+      "type": "BOX",
+      "size": [
+        0.027,
+        0.01,
+        0.03
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 42>",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.01,
+        0.01,
+        0.018
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0001
+      ],
+      "condim": 3,
+      "solref": [
+        0.02,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box1",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.0325,
+        0.015,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box2",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.01,
+        0.015,
+        0.005
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_sph_tip1",
+      "body": "gripper",
+      "type": "SPHERE",
+      "size": [
+        0.00075,
+        0.0,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_sph_tip2",
+      "body": "gripper",
+      "type": "SPHERE",
+      "size": [
+        0.00075,
+        0.0,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_sph_tip3",
+      "body": "gripper",
+      "type": "SPHERE",
+      "size": [
+        0.00075,
+        0.0,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 48>",
+      "body": "gripper",
+      "type": "MESH",
+      "size": [
+        0.01012,
+        0.01613,
+        0.04784
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box3",
+      "body": "gripper",
+      "type": "CAPSULE",
+      "size": [
+        0.0011,
+        0.002,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box4",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.001,
+        0.004,
+        0.004
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box5",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.001,
+        0.005,
+        0.006
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box6",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.001,
+        0.009,
+        0.008
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "fixed_jaw_box7",
+      "body": "gripper",
+      "type": "BOX",
+      "size": [
+        0.001,
+        0.01,
+        0.008
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "camera_box1",
+      "body": "camera_mount",
+      "type": "BOX",
+      "size": [
+        0.015,
+        0.015,
+        0.003
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "camera_box2",
+      "body": "camera_mount",
+      "type": "BOX",
+      "size": [
+        0.021,
+        0.021,
+        0.003
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 60>",
+      "body": "moving_jaw_so101_v1",
+      "type": "MESH",
+      "size": [
+        0.00822,
+        0.01234,
+        0.02272
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "<unnamed 61>",
+      "body": "moving_jaw_so101_v1",
+      "type": "MESH",
+      "size": [
+        0.00471,
+        0.00722,
+        0.01399
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "moving_jaw_box1",
+      "body": "moving_jaw_so101_v1",
+      "type": "BOX",
+      "size": [
+        0.01,
+        0.01,
+        0.015
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "moving_jaw_sph_tip1",
+      "body": "moving_jaw_so101_v1",
+      "type": "SPHERE",
+      "size": [
+        0.00075,
+        0.0,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "moving_jaw_sph_tip2",
+      "body": "moving_jaw_so101_v1",
+      "type": "SPHERE",
+      "size": [
+        0.00075,
+        0.0,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "moving_jaw_sph_tip3",
+      "body": "moving_jaw_so101_v1",
+      "type": "SPHERE",
+      "size": [
+        0.00075,
+        0.0,
+        0.0
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "moving_jaw_box2",
+      "body": "moving_jaw_so101_v1",
+      "type": "BOX",
+      "size": [
+        0.001,
+        0.004,
+        0.004
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    },
+    {
+      "name": "moving_jaw_box3",
+      "body": "moving_jaw_so101_v1",
+      "type": "BOX",
+      "size": [
+        0.001,
+        0.005,
+        0.006
+      ],
+      "friction": [
+        1.0,
+        0.005,
+        0.0005
+      ],
+      "condim": 6,
+      "solref": [
+        0.01,
+        1.0
+      ],
+      "solimp": [
+        0.9,
+        0.95,
+        0.001,
+        0.5,
+        2.0
+      ]
+    }
+  ],
+  "cameras": [
+    {
+      "name": "front",
+      "body": "world",
+      "fovy_deg": 60.0,
+      "pos": [
+        0.5,
+        0.0,
+        0.2
+      ]
+    },
+    {
+      "name": "top",
+      "body": "world",
+      "fovy_deg": 60.0,
+      "pos": [
+        0.2,
+        0.0,
+        0.48
+      ]
+    },
+    {
+      "name": "wrist_cam",
+      "body": "camera_mount",
+      "fovy_deg": 61.0,
+      "pos": [
+        -0.00296,
+        0.05436,
+        -0.0531
+      ]
+    }
+  ]
+}
